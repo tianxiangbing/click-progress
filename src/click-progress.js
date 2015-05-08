@@ -21,7 +21,7 @@
 		$(this).each(function() {
 			var car = new ClickProgress();
 			var options = $.extend({
-				trigger:$(this)
+				trigger: $(this)
 			}, settings);
 			car.init(options);
 			list.push(car);
@@ -35,19 +35,20 @@
 			this.settings = settings;
 			this.trigger = $(settings.trigger);
 			this.target = $(settings.target);
-			this.v = settings.v||10;
-			this.dv = this.v;//初始速度
-			this.a = settings.a||1;
-			this.change = settings.change||"height";
-			this.time = settings.time||30;
-			if(this.change =="height"){
+			this.v = settings.v || 10;
+			this.dv = this.v; //初始速度
+			this.a = settings.a || 1;
+			this.da = this.a;
+			this.change = settings.change || "height";
+			this.time = settings.time || 30;
+			if (this.change == "height") {
 				this.range = $(this.target).height();
-			}else{
+			} else {
 				this.range = $(this.target).width();
 			}
 			this.finish = this.target.children().first();
-			this.full = this.target [this.change]();
-			this.power=1;
+			this.full = this.target[this.change]();
+			this.power = 1;
 			this.bindEvent();
 		},
 		touch: function(obj, trigger, fn) {
@@ -69,43 +70,49 @@
 				}
 				move = false;
 			});
-			$(obj).on('click', trigger, click);
+			$(obj).on('mousedown', trigger, click);
 
 			function click(e) {
 				return fn.call(this, e);
 			}
 		},
-		bindEvent:function(){
+		bindEvent: function() {
 			var _this = this;
-			this.touch(this.trigger,function(){
+			this.touch(this.trigger, function() {
 				_this.v = _this.dv;
 				_this.setup();
-				_this.settings.clicked&&_this.settings.clicked(_this.trigger,_this.target,_this.power);
+				_this.settings.clicked && _this.settings.clicked(_this.trigger, _this.target, _this.power);
+				return false;
 			});
 		},
-		setup:function(){
+		setup: function() {
 			var _this = this;
-			if(this.timer){
+			if (this.timer) {
 				//clearInterval(this.timer);
-				return ;
+				return;
 			}
-			this.timer = setInterval(function(){
-				if(_this.power<=0  ){
-					clearInterval(_this.timer);
-					_this.timer=null;
-				}
-				_this.power = _this.finish[_this.change]();
-				_this.power+=_this.v;
-				_this.power = Math.max(0,_this.power);
-				_this.power = Math.min (_this.power,_this.full );
-				_this.finish[_this.change](_this.power);
-				if(_this.power==_this.full){
-					clearInterval(_this.timer);
-					_this.settings.callback&&_this.settings.callback(_this.trigger,_this.target,_this.power);
-				}
-				_this.settings.progress&&_this.settings.progress(_this.trigger,_this.target,_this.power);
-				_this.v-=_this.a;
-			},this.time);
+			this.timer = setInterval(function() {
+				_this.animate();
+			}, this.time);
+		},
+		animate:function(){
+			var _this =this;
+			_this.power = _this.finish[_this.change]();
+			_this.power += _this.v;
+			_this.power = Math.max(0, _this.power);
+			_this.power = Math.min(_this.power, _this.full);
+			_this.finish[_this.change](_this.power);
+			if (_this.power == _this.full) {
+				//clearInterval(_this.timer);
+				_this.settings.callback && _this.settings.callback.call(this,_this.trigger, _this.target, _this.power);
+			}
+			_this.settings.progress && _this.settings.progress(_this.trigger, _this.target, _this.power);
+			_this.a =_this.da + (1 *_this.power/ _this.full) ;
+			_this.v -= _this.a;
+			if (_this.power <= 0) {
+				clearInterval(_this.timer);
+				_this.timer = null;
+			}
 		}
 	}
 	return ClickProgress;
