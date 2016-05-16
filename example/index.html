@@ -10,6 +10,10 @@
 		<div class="progress"><div class="progress-finished"></div></div>
         <input type="button" value="click" id="click"/>
 		<br/>
+
+		<div class="press"><div class="progress-finished"></div></div>
+        <input type="button" value="press" id="press"/>
+		<br/>
 		<br/>
 		<div class="transverse"><div class="progress-finished"></div></div>
         <input type="button" value="click" id="click2"/>
@@ -39,13 +43,31 @@
 			change:'width',
 			time:30,
 			clicked:function(a,b,c){
+				//console.log(c,'加油')
+				},
+			progress:function(a,b,c){
+				console.log(c)
+				},
+			callback:function(){
+				//alert('完成了')
+			}
+		});
+
+		$('#press').ClickProgress({
+			target:$('.press'),
+			v:15,
+			a:0,
+			change:'height',
+			time:30,
+			event:'press',
+			clicked:function(a,b,c){
 				console.log(c,'加油')
 				},
 			progress:function(a,b,c){
 				console.log(c)
 				},
 			callback:function(){
-				alert('完成了')
+				console.log('发射！！！')
 			}
 		});
 		</script>
